@@ -1,22 +1,32 @@
 // filepath: backend/server.js
 const express = require('express');
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const bodyParser = require('body-parser');
-const cors = require('cors')
-const dotenv = require('dotenv');
-
-dotenv.config();
+const cors = require('cors');
+const config = require('./config');
 
 const app = express();
 
 // Middleware
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
 
+// Example route
+app.get('/', (req, res) => {
+  res.send('Expense Tracker API is running');
+});
 
-
-// Start the server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Connect to MongoDB
+mongoose.connect(config.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => {
+  console.log('MongoDB connected');
+  // Start server after DB connection
+  app.listen(config.PORT, () => {
+    console.log(`Server running on port ${config.PORT}`);
+  });
+})
+.catch((err) => {
+  console.error('MongoDB connection error:', err);
+});
